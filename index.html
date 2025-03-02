@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tebak Warna Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #colorDisplay {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-transform: uppercase;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .colorBox {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .colorBox:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+
+        #message {
+            font-size: 1.2em;
+            margin: 20px 0;
+            min-height: 25px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .score {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Tebak Warna!</h1>
+        <p>Tebak warna yang sesuai dengan kode RGB di bawah!</p>
+    </div>
+    
+    <div id="colorDisplay">RGB(255, 0, 0)</div>
+    <div id="message"></div>
+    
+    <div class="container" id="colorContainer"></div>
+    
+    <button onclick="resetGame()">Warna Baru</button>
+    <div class="score">
+        Skor: <span id="scoreValue">0</span> | Rekor: <span id="highScoreValue">0</span>
+    </div>
+
+    <script>
+        let score = 0;
+        let highScore = 0;
+        let correctColor;
+        
+        function generateRandomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function initializeGame() {
+            const colorContainer = document.getElementById('colorContainer');
+            colorContainer.innerHTML = '';
+            correctColor = generateRandomColor();
+            document.getElementById('colorDisplay').textContent = correctColor;
+            
+            // Generate 6 warna acak
+            const colors = [correctColor];
+            for (let i = 0; i < 5; i++) {
+                colors.push(generateRandomColor());
+            }
+            
+            // Acak posisi warna
+            colors.sort(() => Math.random() - 0.5);
+            
+            // Buat kotak warna
+            colors.forEach(color => {
+                const colorBox = document.createElement('div');
+                colorBox.className = 'colorBox';
+                colorBox.style.backgroundColor = color;
+                colorBox.addEventListener('click', () => checkAnswer(color));
+                colorContainer.appendChild(colorBox);
+            });
+        }
+
+        function checkAnswer(selectedColor) {
+            const message = document.getElementById('message');
+            if (selectedColor === correctColor) {
+                message.textContent = "Benar! 🎉";
+                message.style.color = "green";
+                score++;
+                if (score > highScore) {
+                    highScore = score;
+                    document.getElementById('highScoreValue').textContent = highScore;
+                }
+                document.getElementById('scoreValue').textContent = score;
+                setTimeout(initializeGame, 1000);
+            } else {
+                message.textContent = "Salah! Coba lagi... 😕";
+                message.style.color = "red";
+                score = 0;
+                document.getElementById('scoreValue').textContent = score;
+                event.target.style.opacity = "0.3";
+                event.target.style.pointerEvents = "none";
+            }
+        }
+
+        function resetGame() {
+            score = 0;
+            document.getElementById('scoreValue').textContent = score;
+            document.getElementById('message').textContent = '';
+            initializeGame();
+            const colorBoxes = document.getElementsByClassName('colorBox');
+            Array.from(colorBoxes).forEach(box => {
+                box.style.opacity = "1";
+                box.style.pointerEvents = "auto";
+            });
+        }
+
+        // Mulai game pertama kali
+        initializeGame();
+    </script>
+</body>
+</html>
